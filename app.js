@@ -7,16 +7,31 @@ const app = express();
 // Input records.js
 const records = require('./records');
 
+// Express Middleware - Tell Results are Expected as JSON
+app.use(express.json());
+
 // Send a GET request to /quotes to READ (view) a list of quotes
 app.get('/quotes', async (req, res) => {
-    const quotes = await records.getQuotes();
-    res.json(quotes);
+    try {
+        const quotes = await records.getQuotes();
+        res.json(quotes);
+    } catch (err) {
+        res.status(500).json({message: err.message});
+    }
 });
 
 // Send a GET request to /quotes/:id to READ(view) a quote
 app.get('/quotes/:id', async (req, res) => {
-    const quote = await records.getQuote(req.params.id);
-    res.json(quote);
+    try {
+        const quote = await records.getQuote(req.params.id);
+        if (quote) {
+            res.json(quote);
+        } else {
+            res.status(404).json({message: "Sorry! Quote not found!"});
+        }
+    } catch(err) {
+        res.status(500).json({message: err.message});
+    }
 });
 
 // Send a POST request to /quotes to CREATE a new quote
